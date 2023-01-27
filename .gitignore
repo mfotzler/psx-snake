@@ -1,6 +1,9 @@
 build
 .vscode
 .idea
+CMakeCache.txt
+CMakeFiles
+cmake-build-debug
 
 # Prerequisites
 *.d
