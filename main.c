@@ -58,6 +58,7 @@ void init() {
 
 	InitPAD(padbuff[0], 34, padbuff[1], 34);
 	StartPAD();
+    ChangeClearPAD(1);
 }
 
 void drawSquare(TILE* tile, int x, int y) {
