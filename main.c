@@ -50,9 +50,9 @@ void init() {
     SetDefDrawEnv(&draw[1], 0, 0, 320, 240);
 
     draw[0].isbg = 1;               // Enable clear
-    setRGB0(&draw[0], 63, 0, 127);  // Set clear color (dark purple)
+    setRGB0(&draw[0], 0, 0, 0);  // Set clear color (dark purple)
     draw[1].isbg = 1;
-    setRGB0(&draw[1], 63, 0, 127);
+    setRGB0(&draw[1], 0, 0, 0);
 
     nextpri = pribuff[0];           // Set initial primitive pointer address
 
@@ -84,38 +84,45 @@ bool isController1Connected() {
 	return padbuff[0][0] == 0;
 }
 
+bool isButtonPressed(PADTYPE *pad, PadButton button) {
+    return !(pad->btn & button);
+}
+
+void updatePositionFromPad(PADTYPE *pad, int *x, int *y) {
+    if(isController1Connected()) {
+        if(isButtonPressed(pad, PAD_RIGHT))
+            *x += 4;
+        if(isButtonPressed(pad, PAD_LEFT))
+            *x -= 4;
+        if(isButtonPressed(pad, PAD_DOWN))
+            *y += 4;
+        if(isButtonPressed(pad, PAD_UP))
+            *y -= 4;
+    }
+}
+
+void beforeGameLogic() {
+    ClearOTagR(ot[db], OTLEN);  // Clear ordering table
+}
+
+void afterGameLogic() {
+    display();
+}
+
 int main() {
     TILE *tile;                     // Primitive pointer
     int x = 150;
 	int y = 100;
+    PADTYPE *pad = (PADTYPE*)padbuff[0];
+
 	init();
-
     while(1) {
+        beforeGameLogic();
 
-        ClearOTagR(ot[db], OTLEN);  // Clear ordering table   
-
-		if(isController1Connected()) {
-			u_short button = *((u_short*)(padbuff[0]+2));
-
-			if(!(button & PAD_RIGHT)) {
-				x += 4;
-			}
-			if(!(button & PAD_LEFT)) {
-				x -= 4;
-			}
-			if(!(button & PAD_DOWN)) {
-				y += 4;
-			}
-			if(!(button & PAD_UP)) {
-				y -= 4;
-			}
-		}
-
+        updatePositionFromPad(pad, &x, &y);
 		drawSquare(tile, x, y);
-    
-        // Update the display
-        display();
-        
+
+        afterGameLogic();
     }
     
     return 0;
