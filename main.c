@@ -73,14 +73,6 @@ void drawSquare(TILE* tile, int x, int y) {
 	nextpri += sizeof(TILE);    // Advance the next primitive pointer
 }
 
-int jitter(int currentValue, int min, int max, int defaultValue) {
-	int result = currentValue + (rand() % 11 - 5);
-	if(result > max || result < min)
-		result = defaultValue;
-
-	return result;
-}
-
 bool isController1Connected() {
 	return padbuff[0][0] == 0;
 }
