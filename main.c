@@ -21,7 +21,6 @@ char *nextpri;          // Next primitive pointer
 u_char padbuff[2][34];  // Controller input buffers
 
 void display() {
-    
     DrawSync(0);                // Wait for any graphics processing to finish
     
     VSync(0);                   // Wait for vertical retrace
@@ -35,7 +34,6 @@ void display() {
     
     db = !db;                   // Swap buffers on every pass (alternates between 1 and 0)
     nextpri = pribuff[db];      // Reset next primitive pointer
-    
 }
 
 void init() {
@@ -59,18 +57,35 @@ void init() {
 	InitPAD(padbuff[0], 34, padbuff[1], 34);
 	StartPAD();
     ChangeClearPAD(1);
+
+    // Load the internal font texture
+    FntLoad(960, 0);
+    // Create the text stream
+    FntOpen(100, 48, 200, 100, 0, 100);
+}
+
+void drawRectangle(TILE* tile, int x, int y, int w, int h, int r, int g, int b) {
+    tile = (TILE*)nextpri;      // Cast next primitive
+
+    setTile(tile);              // Initialize the primitive (very important)
+    setXY0(tile, x, y);       // Set primitive (x,y) position
+    setWH(tile, w, h);        // Set primitive size
+    setRGB0(tile, r, g, b); // Set color yellow
+    addPrim(ot[db], tile);      // Add primitive to the ordering table
+
+    nextpri += sizeof(TILE);    // Advance the next primitive pointer
 }
 
 void drawSquare(TILE* tile, int x, int y) {
-	tile = (TILE*)nextpri;      // Cast next primitive
+    drawRectangle(tile, x, y, 10, 10, 255, 255, 0);
+}
 
-	setTile(tile);              // Initialize the primitive (very important)
-	setXY0(tile, x, y);       // Set primitive (x,y) position
-	setWH(tile, 8, 8);        // Set primitive size
-	setRGB0(tile, 255, 255, 0); // Set color yellow
-	addPrim(ot[db], tile);      // Add primitive to the ordering table
-	
-	nextpri += sizeof(TILE);    // Advance the next primitive pointer
+void drawWalls() {
+    TILE* walls = malloc(sizeof(TILE) * 4);
+    drawRectangle(&walls[0], 0, 0, 320, 20, 0, 0, 150);
+    drawRectangle(&walls[1], 0, 220, 320, 20, 0, 0, 150);
+    drawRectangle(&walls[2], 0, 0, 20, 240, 0, 0, 150);
+    drawRectangle(&walls[3], 300, 0, 20, 240, 0, 0, 150);
 }
 
 bool isController1Connected() {
@@ -102,18 +117,43 @@ void afterGameLogic() {
     display();
 }
 
+bool isColliding(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2) {
+    return x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
+}
+
+bool isPlayerCollidingWithWall(int x, int y) {
+    return isColliding(x, y, 10, 10, 0, 0, 320, 20) ||
+        isColliding(x, y, 10, 10, 0, 220, 320, 20) ||
+        isColliding(x, y, 10, 10, 0, 0, 20, 240) ||
+        isColliding(x, y, 10, 10, 300, 0, 20, 240);
+}
+
 int main() {
     TILE *tile;                     // Primitive pointer
     int x = 150;
 	int y = 100;
     PADTYPE *pad = (PADTYPE*)padbuff[0];
+    bool isGameOver = false;
 
 	init();
     while(1) {
         beforeGameLogic();
 
-        updatePositionFromPad(pad, &x, &y);
-		drawSquare(tile, x, y);
+        drawWalls();
+        drawSquare(tile, x, y);
+
+        if(!isGameOver) {
+            updatePositionFromPad(pad, &x, &y);
+        }
+
+        if(isPlayerCollidingWithWall(x, y)) {
+            isGameOver = true;
+        }
+
+        if(isGameOver) {
+            FntPrint(-1, "GAME OVER");
+            FntFlush(-1);
+        }
 
         afterGameLogic();
     }
