@@ -81,11 +81,11 @@ void drawSquare(TILE *tile, int x, int y) {
 }
 
 void drawWalls() {
-    TILE *walls = malloc(sizeof(TILE) * 4);
-    drawRectangle(&walls[0], 0, 0, 320, 20, 0, 0, 150);
-    drawRectangle(&walls[1], 0, 220, 320, 20, 0, 0, 150);
-    drawRectangle(&walls[2], 0, 0, 20, 240, 0, 0, 150);
-    drawRectangle(&walls[3], 300, 0, 20, 240, 0, 0, 150);
+    TILE *walls[4];
+    drawRectangle(walls[0], 0, 0, 320, 20, 0, 0, 150);
+    drawRectangle(walls[1], 0, 220, 320, 20, 0, 0, 150);
+    drawRectangle(walls[2], 0, 0, 20, 240, 0, 0, 150);
+    drawRectangle(walls[3], 300, 0, 20, 240, 0, 0, 150);
 }
 
 bool isController1Connected() {
