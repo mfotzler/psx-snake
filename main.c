@@ -1,15 +1,15 @@
-#include <sys/types.h>	// This provides typedefs needed by libgte.h and libgpu.h
-#include <stdio.h>	// Not necessary but include it anyway
+#include <sys/types.h>    // This provides typedefs needed by libgte.h and libgpu.h
+#include <stdio.h>    // Not necessary but include it anyway
 #include <stdlib.h>
 #include <stdbool.h>
-#include <psxetc.h>	// Includes some functions that controls the display
-#include <psxgte.h>	// GTE header, not really used but libgpu.h depends on it
-#include <psxgpu.h>	// GPU library header
+#include <psxetc.h>    // Includes some functions that controls the display
+#include <psxgte.h>    // GTE header, not really used but libgpu.h depends on it
+#include <psxgpu.h>    // GPU library header
 #include <psxpad.h>
 #include <psxapi.h>
 
 #define OTLEN 8         // Ordering table length (recommended to set as a define
-                        // so it can be changed easily)
+// so it can be changed easily)
 
 DISPENV disp[2];
 DRAWENV draw[2];
@@ -22,7 +22,7 @@ u_char padbuff[2][34];  // Controller input buffers
 
 void display() {
     DrawSync(0);                // Wait for any graphics processing to finish
-    
+
     VSync(0);                   // Wait for vertical retrace
 
     PutDispEnv(&disp[db]);      // Apply the DISPENV/DRAWENVs
@@ -30,8 +30,8 @@ void display() {
 
     SetDispMask(1);             // Enable the display
 
-    DrawOTag(ot[db]+OTLEN-1);   // Draw the ordering table
-    
+    DrawOTag(ot[db] + OTLEN - 1);   // Draw the ordering table
+
     db = !db;                   // Swap buffers on every pass (alternates between 1 and 0)
     nextpri = pribuff[db];      // Reset next primitive pointer
 }
@@ -54,8 +54,8 @@ void init() {
 
     nextpri = pribuff[0];           // Set initial primitive pointer address
 
-	InitPAD(padbuff[0], 34, padbuff[1], 34);
-	StartPAD();
+    InitPAD(padbuff[0], 34, padbuff[1], 34);
+    StartPAD();
     ChangeClearPAD(1);
 
     // Load the internal font texture
@@ -64,8 +64,8 @@ void init() {
     FntOpen(100, 48, 200, 100, 0, 100);
 }
 
-void drawRectangle(TILE* tile, int x, int y, int w, int h, int r, int g, int b) {
-    tile = (TILE*)nextpri;      // Cast next primitive
+void drawRectangle(TILE *tile, int x, int y, int w, int h, int r, int g, int b) {
+    tile = (TILE *) nextpri;      // Cast next primitive
 
     setTile(tile);              // Initialize the primitive (very important)
     setXY0(tile, x, y);       // Set primitive (x,y) position
@@ -76,12 +76,12 @@ void drawRectangle(TILE* tile, int x, int y, int w, int h, int r, int g, int b) 
     nextpri += sizeof(TILE);    // Advance the next primitive pointer
 }
 
-void drawSquare(TILE* tile, int x, int y) {
+void drawSquare(TILE *tile, int x, int y) {
     drawRectangle(tile, x, y, 10, 10, 255, 255, 0);
 }
 
 void drawWalls() {
-    TILE* walls = malloc(sizeof(TILE) * 4);
+    TILE *walls = malloc(sizeof(TILE) * 4);
     drawRectangle(&walls[0], 0, 0, 320, 20, 0, 0, 150);
     drawRectangle(&walls[1], 0, 220, 320, 20, 0, 0, 150);
     drawRectangle(&walls[2], 0, 0, 20, 240, 0, 0, 150);
@@ -89,7 +89,7 @@ void drawWalls() {
 }
 
 bool isController1Connected() {
-	return padbuff[0][0] == 0;
+    return padbuff[0][0] == 0;
 }
 
 bool isButtonPressed(PADTYPE *pad, PadButton button) {
@@ -97,14 +97,14 @@ bool isButtonPressed(PADTYPE *pad, PadButton button) {
 }
 
 void updatePositionFromPad(PADTYPE *pad, int *x, int *y) {
-    if(isController1Connected()) {
-        if(isButtonPressed(pad, PAD_RIGHT))
+    if (isController1Connected()) {
+        if (isButtonPressed(pad, PAD_RIGHT))
             *x += 4;
-        if(isButtonPressed(pad, PAD_LEFT))
+        if (isButtonPressed(pad, PAD_LEFT))
             *x -= 4;
-        if(isButtonPressed(pad, PAD_DOWN))
+        if (isButtonPressed(pad, PAD_DOWN))
             *y += 4;
-        if(isButtonPressed(pad, PAD_UP))
+        if (isButtonPressed(pad, PAD_UP))
             *y -= 4;
     }
 }
@@ -123,40 +123,40 @@ bool isColliding(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 
 bool isPlayerCollidingWithWall(int x, int y) {
     return isColliding(x, y, 10, 10, 0, 0, 320, 20) ||
-        isColliding(x, y, 10, 10, 0, 220, 320, 20) ||
-        isColliding(x, y, 10, 10, 0, 0, 20, 240) ||
-        isColliding(x, y, 10, 10, 300, 0, 20, 240);
+           isColliding(x, y, 10, 10, 0, 220, 320, 20) ||
+           isColliding(x, y, 10, 10, 0, 0, 20, 240) ||
+           isColliding(x, y, 10, 10, 300, 0, 20, 240);
 }
 
 int main() {
     TILE *tile;                     // Primitive pointer
     int x = 150;
-	int y = 100;
-    PADTYPE *pad = (PADTYPE*)padbuff[0];
+    int y = 100;
+    PADTYPE *pad = (PADTYPE *) padbuff[0];
     bool isGameOver = false;
 
-	init();
-    while(1) {
+    init();
+    while (1) {
         beforeGameLogic();
 
         drawWalls();
         drawSquare(tile, x, y);
 
-        if(!isGameOver) {
+        if (!isGameOver) {
             updatePositionFromPad(pad, &x, &y);
         }
 
-        if(isPlayerCollidingWithWall(x, y)) {
+        if (isPlayerCollidingWithWall(x, y)) {
             isGameOver = true;
         }
 
-        if(isGameOver) {
+        if (isGameOver) {
             FntPrint(-1, "GAME OVER");
             FntFlush(-1);
         }
 
         afterGameLogic();
     }
-    
+
     return 0;
 }
