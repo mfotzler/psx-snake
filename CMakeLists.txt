@@ -11,7 +11,7 @@ project(
 	HOMEPAGE_URL "https://github.com/mfotzler/psx-snake"
 )
 
-psn00bsdk_add_executable(template GPREL main.c)
+psn00bsdk_add_executable(template GPREL main.c game.c)
 
 psn00bsdk_add_cd_image(
 	iso      # Target name
