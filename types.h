@@ -1,7 +1,3 @@
-//
-// Created by mfotz on 2/10/2023.
-//
-
 #ifndef PSX_SNAKE_TYPES_H
 #define PSX_SNAKE_TYPES_H
 

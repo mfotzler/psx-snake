@@ -90,14 +90,6 @@ void drawWalls() {
     drawRectangle(walls[3], 300, 0, 20, 240, 0, 0, 150);
 }
 
-bool isController1Connected() {
-    return padbuff[0][0] == 0;
-}
-
-bool isButtonPressed(PADTYPE *pad, PadButton button) {
-    return !(pad->btn & button);
-}
-
 void beforeGameLogic() {
     ClearOTagR(ot[db], OTLEN);  // Clear ordering table
 }

@@ -14,8 +14,16 @@ bool isPlayerCollidingWithWall(int x, int y) {
            isColliding(x, y, 10, 10, 300, 0, 20, 240);
 }
 
+bool isController1Connected(GameState *gameState) {
+    return gameState->pad->stat == 0;
+}
+
+bool isButtonPressed(PADTYPE *pad, PadButton button) {
+    return !(pad->btn & button);
+}
+
 void updatePositionFromPad(GameState *gameState) {
-    if (isController1Connected()) {
+    if (isController1Connected(gameState)) {
         if (isButtonPressed(gameState->pad, PAD_RIGHT))
             gameState->x += 4;
         if (isButtonPressed(gameState->pad, PAD_LEFT))
