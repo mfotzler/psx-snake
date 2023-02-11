@@ -77,6 +77,25 @@ bool shouldUpdateTail(GameState *gameState) {
     return gameState->pixelsMovedSinceLastTailUpdate > PLAYER_SIZE;
 }
 
+bool isPlayerCollidingWithTail(int x, int y, short tail[][2], int tailLength) {
+    for (int i = 3; i < tailLength; i++) {
+        if (isColliding(x, y, 10, 10, tail[i][0], tail[i][1], 10, 10)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isPlayerDead(GameState *gameState) {
+    if (isPlayerCollidingWithWall(gameState->x, gameState->y))
+        return true;
+
+    if(isPlayerCollidingWithTail(gameState->x, gameState->y, gameState->tail, gameState->tailLength))
+        return true;
+
+    return false;
+}
+
 void processGameLogic(GameState *gameState) {
     updateIsFoodEaten(gameState);
     if(gameState->isFoodEaten)
@@ -88,9 +107,8 @@ void processGameLogic(GameState *gameState) {
             updateTail(gameState);
     }
 
-    if (isPlayerCollidingWithWall(gameState->x, gameState->y)) {
+    if(isPlayerDead(gameState))
         gameState->isGameOver = true;
-    }
 
     if (gameState->isGameOver) {
         FntPrint(-1, "GAME OVER. PRESS START TO RESTART");
