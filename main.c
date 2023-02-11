@@ -78,8 +78,8 @@ void drawRectangle(TILE *tile, int x, int y, int w, int h, int r, int g, int b) 
     nextpri += sizeof(TILE);    // Advance the next primitive pointer
 }
 
-void drawSquare(TILE *tile, int x, int y) {
-    drawRectangle(tile, x, y, 10, 10, 255, 255, 0);
+void drawSquare(TILE *tile, int x, int y, int r, int g, int b) {
+    drawRectangle(tile, x, y, 10, 10, r, g, b);
 }
 
 void drawWalls() {
@@ -102,6 +102,11 @@ int main() {
     GameState gameState;
     gameState.x = 150;
     gameState.y = 100;
+    gameState.velocityX = 0;
+    gameState.velocityY = 0;
+    gameState.foodX = 200;
+    gameState.foodY = 150;
+    gameState.isFoodEaten = false;
     gameState.isGameOver = false;
     gameState.pad = (PADTYPE *) padbuff[0];
 
@@ -110,7 +115,8 @@ int main() {
         beforeGameLogic();
 
         drawWalls();
-        drawSquare(gameState.tile, gameState.x, gameState.y);
+        drawSquare(gameState.tile, gameState.x, gameState.y, 255, 255, 0);
+        drawSquare(gameState.tile, gameState.foodX, gameState.foodY, 255, 0, 0);
 
         processGameLogic(&gameState);
 
