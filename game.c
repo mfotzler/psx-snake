@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <psxgpu.h>
 #include <psxpad.h>
+#include <stdlib.h>
 #include "types.h"
 
 #define SNAKE_SPEED 2
@@ -45,6 +46,7 @@ void updatePositionFromPad(GameState *gameState) {
 
         gameState->x += gameState->velocityX;
         gameState->y += gameState->velocityY;
+        gameState->pixelsMovedSinceLastTailUpdate += abs(gameState->velocityX) + abs(gameState->velocityY);
     }
 }
 
@@ -54,16 +56,33 @@ void updateIsFoodEaten(GameState *gameState) {
     }
 }
 
+void updateTail(GameState *gameState) {
+    for (int i = gameState->tailLength; i > 0; i--) {
+        gameState->tail[i][0] = gameState->tail[i - 1][0];
+        gameState->tail[i][1] = gameState->tail[i - 1][1];
+    }
+    gameState->tail[0][0] = gameState->x;
+    gameState->tail[0][1] = gameState->y;
+    gameState->pixelsMovedSinceLastTailUpdate = 0;
+}
+
+bool shouldUpdateTail(GameState *gameState) {
+    return gameState->pixelsMovedSinceLastTailUpdate > PLAYER_SIZE;
+}
+
 void processGameLogic(GameState *gameState) {
     updateIsFoodEaten(gameState);
     if(gameState->isFoodEaten) {
         gameState->foodX = rand() % 300;
         gameState->foodY = rand() % 200;
+        gameState->tailLength++;
         gameState->isFoodEaten = false;
     }
 
     if (!gameState->isGameOver) {
         updatePositionFromPad(gameState);
+        if (shouldUpdateTail(gameState))
+            updateTail(gameState);
     }
 
     if (isPlayerCollidingWithWall(gameState->x, gameState->y)) {

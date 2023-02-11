@@ -79,7 +79,7 @@ void drawRectangle(TILE *tile, int x, int y, int w, int h, int r, int g, int b) 
 }
 
 void drawSquare(TILE *tile, int x, int y, int r, int g, int b) {
-    drawRectangle(tile, x, y, 10, 10, r, g, b);
+    drawRectangle(tile, x, y, PLAYER_SIZE, PLAYER_SIZE, r, g, b);
 }
 
 void drawWalls() {
@@ -98,17 +98,29 @@ void afterGameLogic() {
     display();
 }
 
+void initializeGameState(GameState *gameState) {
+    gameState->x = 150;
+    gameState->y = 100;
+    gameState->tailLength = 0;
+    gameState->pixelsMovedSinceLastTailUpdate = 0;
+    gameState->velocityX = 0;
+    gameState->velocityY = 0;
+    gameState->foodX = 200;
+    gameState->foodY = 150;
+    gameState->isFoodEaten = false;
+    gameState->isGameOver = false;
+    gameState->pad = (PADTYPE *) padbuff[0];
+}
+
+void drawTail(TILE *tile, short tail[100][2], int tailLength) {
+    for (int i = 0; i < tailLength; i++) {
+        drawSquare(tile, tail[i][0], tail[i][1], 0, 255, 0);
+    }
+}
+
 int main() {
     GameState gameState;
-    gameState.x = 150;
-    gameState.y = 100;
-    gameState.velocityX = 0;
-    gameState.velocityY = 0;
-    gameState.foodX = 200;
-    gameState.foodY = 150;
-    gameState.isFoodEaten = false;
-    gameState.isGameOver = false;
-    gameState.pad = (PADTYPE *) padbuff[0];
+    initializeGameState(&gameState);
 
     init();
     while (1) {
@@ -117,6 +129,7 @@ int main() {
         drawWalls();
         drawSquare(gameState.tile, gameState.x, gameState.y, 255, 255, 0);
         drawSquare(gameState.tile, gameState.foodX, gameState.foodY, 255, 0, 0);
+        drawTail(gameState.tile, gameState.tail, gameState.tailLength);
 
         processGameLogic(&gameState);
 
