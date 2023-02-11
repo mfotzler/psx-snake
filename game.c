@@ -73,8 +73,8 @@ bool shouldUpdateTail(GameState *gameState) {
 void processGameLogic(GameState *gameState) {
     updateIsFoodEaten(gameState);
     if(gameState->isFoodEaten) {
-        gameState->foodX = rand() % 300;
-        gameState->foodY = rand() % 200;
+        gameState->foodX = rand() % 280 + 20;
+        gameState->foodY = rand() % 200 + 20;
         gameState->tailLength++;
         gameState->isFoodEaten = false;
     }
