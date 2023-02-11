@@ -63,7 +63,7 @@ void init() {
     // Load the internal font texture
     FntLoad(960, 0);
     // Create the text stream
-    FntOpen(100, 48, 200, 100, 0, 100);
+    FntOpen(30, 48, 275, 100, 0, 100);
 }
 
 void drawRectangle(TILE *tile, int x, int y, int w, int h, int r, int g, int b) {
@@ -132,6 +132,10 @@ int main() {
         drawTail(gameState.tile, gameState.tail, gameState.tailLength);
 
         processGameLogic(&gameState);
+
+        if(gameState.isGameOver && isButtonPressed(gameState.pad, PAD_START)) {
+            initializeGameState(&gameState);
+        }
 
         afterGameLogic();
     }

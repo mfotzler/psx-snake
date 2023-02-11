@@ -90,7 +90,7 @@ void processGameLogic(GameState *gameState) {
     }
 
     if (gameState->isGameOver) {
-        FntPrint(-1, "GAME OVER");
+        FntPrint(-1, "GAME OVER. PRESS START TO RESTART");
         FntFlush(-1);
     }
 }
