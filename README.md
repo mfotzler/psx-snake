@@ -1,6 +1,8 @@
 # psx-snake
 Snake game for playstation
 
+![Screenshot of game over state](/screenshot.png?raw=true)
+
 ## Building
 Assuming you have the PSn00bSDK installed and working:
 
