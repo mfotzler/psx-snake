@@ -56,6 +56,13 @@ void updateIsFoodEaten(GameState *gameState) {
     }
 }
 
+void growSnakeAndRespawnFood(GameState *gameState) {
+    gameState->foodX = rand() % 280 + 20;
+    gameState->foodY = rand() % 200 + 20;
+    gameState->tailLength++;
+    gameState->isFoodEaten = false;
+}
+
 void updateTail(GameState *gameState) {
     for (int i = gameState->tailLength; i > 0; i--) {
         gameState->tail[i][0] = gameState->tail[i - 1][0];
@@ -72,12 +79,8 @@ bool shouldUpdateTail(GameState *gameState) {
 
 void processGameLogic(GameState *gameState) {
     updateIsFoodEaten(gameState);
-    if(gameState->isFoodEaten) {
-        gameState->foodX = rand() % 280 + 20;
-        gameState->foodY = rand() % 200 + 20;
-        gameState->tailLength++;
-        gameState->isFoodEaten = false;
-    }
+    if(gameState->isFoodEaten)
+        growSnakeAndRespawnFood(gameState);
 
     if (!gameState->isGameOver) {
         updatePositionFromPad(gameState);
